@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LifeFlow | Blood Stock</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <a class="brand" href="dashboard.html">🩸 LifeFlow</a>
+      <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="register.html">Register</a>
+        <a href="search.html">Search</a>
+        <a href="stock.html">Stock</a>
+        <a href="request.html">Request</a>
+        <a href="logout">Logout</a>
+      </nav>
+    </header>
+
+    <section class="section light">
+      <div class="eyebrow">BLOOD STOCK MANAGEMENT</div>
+      <h2>Available Blood Stock</h2>
+      <p class="muted">View and update available blood units.</p>
+
+      <div id="stockGrid" class="grid"></div>
+
+      <button class="btn" type="button" onclick="loadStock()">
+        Refresh Stock
+      </button>
+
+      <h2>Add Blood Stock</h2>
+
+      <form id="stockForm" class="inline-form">
+        <select name="bloodGroup" required>
+          <option value="">Select Blood Group</option>
+          <option>A+</option>
+          <option>A-</option>
+          <option>B+</option>
+          <option>B-</option>
+          <option>O+</option>
+          <option>O-</option>
+          <option>AB+</option>
+          <option>AB-</option>
+        </select>
+
+        <input
+          name="units"
+          type="number"
+          min="1"
+          placeholder="Units to add"
+          required
+        />
+
+        <button class="btn" type="submit">Add Stock</button>
+      </form>
+
+      <p id="stockMsg" class="message"></p>
+    </section>
+
+    <footer>LifeFlow Blood Bank · Java Servlet + JDBC + MySQL</footer>
+
+    <script>
+      const groups = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"];
+
+      async function loadStock() {
+        const grid = document.getElementById("stockGrid");
+
+        try {
+          const response = await fetch("stock");
+          const stock = await response.json();
+
+          if (!response.ok || stock.error) {
+            throw new Error("Stock loading failed");
+          }
+
+          grid.innerHTML = "";
+
+          groups.forEach((group) => {
+            const card = document.createElement("div");
+            card.className = "card";
+
+            const name = document.createElement("b");
+            name.textContent = group;
+
+            const units = document.createElement("span");
+            units.textContent = (stock[group] || 0) + " units available";
+
+            card.append(name, units);
+            grid.appendChild(card);
+          });
+        } catch (error) {
+          grid.textContent = "Unable to load blood stock.";
+        }
+      }
+
+      document
+        .getElementById("stockForm")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          const message = document.getElementById("stockMsg");
+          message.textContent = "Updating stock...";
+
+          try {
+            const response = await fetch("stock", {
+              method: "POST",
+              body: new URLSearchParams(new FormData(this)),
+            });
+
+            const result = await response.json();
+            message.textContent = result.message;
+
+            if (response.ok && result.success) {
+              this.reset();
+              await loadStock();
+            }
+          } catch (error) {
+            message.textContent = "Stock update failed. Please try again.";
+          }
+        });
+
+      loadStock();
+    </script>
+  </body>
+</html>

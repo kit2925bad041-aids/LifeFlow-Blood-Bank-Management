@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LifeFlow | Search Donors</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <a class="brand" href="dashboard.html">🩸 LifeFlow</a>
+      <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="register.html">Register</a>
+        <a href="search.html">Search</a>
+        <a href="stock.html">Stock</a>
+        <a href="request.html">Request</a>
+        <a href="logout">Logout</a>
+      </nav>
+    </header>
+
+    <section class="section">
+      <div class="eyebrow">BLOOD-GROUP SEARCH</div>
+      <h2>Find Donors</h2>
+      <p class="muted">Select a blood group to find registered donors.</p>
+
+      <div class="search-row">
+        <select id="searchGroup">
+          <option value="">Select Blood Group</option>
+          <option>A+</option>
+          <option>A-</option>
+          <option>B+</option>
+          <option>B-</option>
+          <option>O+</option>
+          <option>O-</option>
+          <option>AB+</option>
+          <option>AB-</option>
+        </select>
+
+        <button class="btn" onclick="searchDonors()">Search Donors</button>
+      </div>
+
+      <div id="results"></div>
+    </section>
+
+    <footer>LifeFlow Blood Bank · Java Servlet + JDBC + MySQL</footer>
+
+    <script>
+      async function searchDonors() {
+        const group = document.getElementById("searchGroup").value;
+        const results = document.getElementById("results");
+
+        if (!group) {
+          results.textContent = "Please select a blood group.";
+          return;
+        }
+
+        results.textContent = "Searching...";
+
+        try {
+          const response = await fetch(
+            "search?bloodGroup=" + encodeURIComponent(group),
+          );
+
+          const donors = await response.json();
+
+          if (!response.ok) {
+            results.textContent = "Unable to search donors.";
+            return;
+          }
+
+          if (!Array.isArray(donors) || donors.length === 0) {
+            results.textContent = "No donors found for " + group + ".";
+            return;
+          }
+
+          results.innerHTML = donors
+            .map((donor) => {
+              const row = document.createElement("div");
+              row.className = "donor-row";
+
+              const name = document.createElement("b");
+              name.textContent = donor.name || "Unknown";
+
+              row.appendChild(name);
+              row.append(
+                document.createTextNode(
+                  " · Age " +
+                    donor.age +
+                    " · " +
+                    (donor.gender || "Not specified") +
+                    " · " +
+                    (donor.blood_group || "Unknown") +
+                    " · " +
+                    donor.phone,
+                ),
+              );
+
+              return row.outerHTML;
+            })
+            .join("");
+        } catch (error) {
+          results.textContent = "Search failed. Please try again.";
+        }
+      }
+    </script>
+  </body>
+</html>

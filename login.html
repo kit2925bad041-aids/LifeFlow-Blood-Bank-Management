@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LifeFlow | Login</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body class="login-page">
+    <div class="login-wrap">
+      <div class="login-brand">🩸 <b>LifeFlow</b></div>
+
+      <div class="login-card">
+        <div class="heart">♥</div>
+
+        <div class="eyebrow">BLOOD BANK MANAGEMENT SYSTEM</div>
+
+        <h1>Welcome Back</h1>
+
+        <p class="muted">
+          Login to manage donors, blood stock and patient requests.
+        </p>
+
+        <form action="login" method="post">
+          <label for="username">Email ID</label>
+          <input
+            type="email"
+            id="username"
+            name="username"
+            placeholder="Enter your email address"
+            required
+          />
+
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Enter password (12345)"
+            required
+          />
+
+          <button class="btn full" type="submit">Login</button>
+        </form>
+
+        <div class="demo">Demo Password: <b>12345</b></div>
+
+        <div id="error" class="error"></div>
+      </div>
+
+      <p class="muted center">Every drop can save a life.</p>
+    </div>
+
+    <script>
+      if (new URLSearchParams(location.search).has("error")) {
+        document.getElementById("error").textContent =
+          "Incorrect email ID or password.";
+      }
+    </script>
+  </body>
+</html>

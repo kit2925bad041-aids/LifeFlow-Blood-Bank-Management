@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Patient Blood Request</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Blood Bank Management System</h1>
+      <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="register.html">Register Donor</a>
+        <a href="search.html">Search Donors</a>
+        <a href="stock.html">Blood Stock</a>
+        <a href="request.html">Patient Request</a>
+        <a href="logout">Logout</a>
+      </nav>
+    </header>
+
+    <main class="container">
+      <h2>Patient Blood Request</h2>
+
+      <form id="requestForm">
+        <label for="patientName">Patient Name</label>
+        <input
+          type="text"
+          id="patientName"
+          name="patientName"
+          placeholder="Enter patient name"
+          required
+        />
+
+        <label for="bloodGroup">Blood Group</label>
+        <select id="bloodGroup" name="bloodGroup" required>
+          <option value="">Select blood group</option>
+          <option value="A+">A+</option>
+          <option value="A-">A-</option>
+          <option value="B+">B+</option>
+          <option value="B-">B-</option>
+          <option value="O+">O+</option>
+          <option value="O-">O-</option>
+          <option value="AB+">AB+</option>
+          <option value="AB-">AB-</option>
+        </select>
+
+        <label for="units">Units Required</label>
+        <input
+          type="number"
+          id="units"
+          name="units"
+          min="1"
+          placeholder="Enter units required"
+          required
+        />
+
+        <button type="submit">Submit Request</button>
+      </form>
+
+      <p id="requestMessage"></p>
+    </main>
+
+    <script>
+      document
+        .getElementById("requestForm")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          const form = new FormData(this);
+          const message = document.getElementById("requestMessage");
+
+          try {
+            const response = await fetch("request", {
+              method: "POST",
+              body: new URLSearchParams(form),
+            });
+
+            const result = await response.json();
+            message.textContent = result.message || "Request processed.";
+
+            if (response.ok && result.success) {
+              this.reset();
+            }
+          } catch (error) {
+            message.textContent = "Request failed. Please try again.";
+          }
+        });
+    </script>
+  </body>
+</html>
